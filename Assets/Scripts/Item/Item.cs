@@ -16,12 +16,15 @@ public enum ItemState
     Held,
     Inventory,
 }
+[RequireComponent(typeof(NetworkTransform))]
+[RequireComponent(typeof(Rigidbody))]
 public abstract class Item : Interactable
 {
     private SyncVar<ItemLocationState> locationState = new(initialValue: ItemLocationState.World());
     [SerializeField] protected Vector3 deltaPos;
     [SerializeField] protected Quaternion rot = Quaternion.identity;
     private Rigidbody rb;
+    private NetworkTransform networkTransform;
 
     public Quaternion GetRotation() => rot;
     public Vector3 GetDeltaPosition() => deltaPos;
@@ -34,6 +37,8 @@ public abstract class Item : Interactable
         locationState.onChanged += OnLocationStateChanged;
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = !isController;
+        networkTransform = GetComponent<NetworkTransform>();
+        OnLocationStateChanged(locationState.value);
     }
 
     protected override void OnDespawned()
@@ -76,20 +81,28 @@ public abstract class Item : Interactable
             transform.localPosition += GetDeltaPosition();
             transform.rotation = Quaternion.identity;
             transform.localRotation = GetRotation(); 
+            networkTransform.enabled = false; // it anyway gets it transform from parent
         }
         else if (newLocationState.Location == ItemLocation.Inventory)
         {
              if (col) col.enabled = false;
             rb.isKinematic = true;
             gameObject.SetActive(false);
+            networkTransform.enabled = false;
         }
         else if (newLocationState.Location == ItemLocation.World)
         {
             gameObject.SetActive(true);
+            networkTransform.enabled = true;
             if (col) col.enabled = true;
             rb.isKinematic = !isServer;
             transform.SetParent(null);
         }
+    }
+
+    private void Update()
+    {
+        //Debug.Log(locationState.value.Location);
     }
 }
 

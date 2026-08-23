@@ -100,10 +100,19 @@
                     "name": "PrevActiveSlot",
                     "type": "Value",
                     "id": "c804fdba-da63-4241-aa81-aaeb41fa392f",
-                    "expectedControlType": "",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Voice",
+                    "type": "Button",
+                    "id": "3512273c-7ed5-4865-8ec6-7c1b58d940b4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -423,6 +432,17 @@
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
                     "action": "PrevActiveSlot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1bf67f94-7c38-40ce-917b-a5dd2a3bc56a",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Voice",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

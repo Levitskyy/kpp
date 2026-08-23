@@ -21,6 +21,7 @@ public class PlayerMovement : NetworkBehaviour
 
     [Header("References")]
     [SerializeField] private Camera playerCamera;
+    public Camera GetPlayerCamera() => playerCamera;
 
     private CharacterController characterController;
     private Vector3 velocity;
@@ -53,11 +54,17 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
+        InstanceHandler.RegisterInstance(this);
+
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
         sprintAction = InputSystem.actions.FindAction("Sprint");
         crouchAction = InputSystem.actions.FindAction("Crouch");
+
+        // telling everyone that audio listener is here
+        var gm = InstanceHandler.GetInstance<GameManager>();
+        gm.InvokeAudioListenerSpawned(playerCamera.GetComponent<AudioListener>());
     }
 
     protected override void OnDespawned()
@@ -68,6 +75,8 @@ public class PlayerMovement : NetworkBehaviour
         {
             return;
         }
+
+        InstanceHandler.UnregisterInstance<PlayerMovement>();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;

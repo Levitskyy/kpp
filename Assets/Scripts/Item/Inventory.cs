@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PurrNet;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Inventory : NetworkBehaviour
@@ -37,6 +38,16 @@ public class Inventory : NetworkBehaviour
 
         item.SetItemState(ItemLocationState.World());
         items[slotNumber] = null;
+    }
+
+    protected override void OnDespawned()
+    {
+        if (!isServer) return;
+
+        foreach (var item in items)
+        {
+            item.SetItemState(ItemLocationState.World());
+        }
     }
 
 }
