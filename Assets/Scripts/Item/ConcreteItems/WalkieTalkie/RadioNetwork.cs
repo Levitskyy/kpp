@@ -17,7 +17,7 @@ public class RadioNetwork : NetworkBehaviour
         _walkieTalkies.Remove(value);
     }
 
-    protected override void OnSpawned()
+    private void Awake()
     {
         InstanceHandler.RegisterInstance(this);
     }

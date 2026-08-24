@@ -31,7 +31,14 @@ public class WalkieTalkie : Item
     {
         base.OnSpawned();
         _localVoice = InstanceHandler.GetInstance<LocalVoiceCapture>();
-        _voiceCodec = new PassthroughVoiceCodec(_localVoice.SampleRate);
+        if (_localVoice.IsUsingSteamVoice)
+        {
+            _voiceCodec = new SteamVoiceCodec(_localVoice.SampleRate);
+        }
+        else
+        {
+            _voiceCodec = new PassthroughVoiceCodec(_localVoice.SampleRate); 
+        }
         _voiceEndpoint = GetComponent<VoiceEndpoint>();
         _voiceEndpoint.AddEffect(new RadioVoiceEffect());
         _localVoice.PacketCaptured += OnPacketCaptured;    

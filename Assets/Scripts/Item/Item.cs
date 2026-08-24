@@ -24,6 +24,7 @@ public abstract class Item : Interactable
     [SerializeField] protected Vector3 deltaPos;
     [SerializeField] protected Quaternion rot = Quaternion.identity;
     private Rigidbody rb;
+    private Collider col;
     private NetworkTransform networkTransform;
 
     public Quaternion GetRotation() => rot;
@@ -36,6 +37,7 @@ public abstract class Item : Interactable
 
         locationState.onChanged += OnLocationStateChanged;
         rb = GetComponent<Rigidbody>();
+        col = GetComponent<Collider>();
         rb.isKinematic = !isController;
         networkTransform = GetComponent<NetworkTransform>();
         OnLocationStateChanged(locationState.value);
@@ -48,15 +50,29 @@ public abstract class Item : Interactable
         locationState.onChanged -= OnLocationStateChanged;
     }
 
+    protected override void OnOwnerChanged(PlayerID? oldOwner, PlayerID? newOwner, bool asServer)
+    {
+        base.OnOwnerChanged(oldOwner, newOwner, asServer);
+        if (newOwner.HasValue)
+        {
+            networkTransform.StartIgnoringParentChanges();
+            networkTransform.enabled = false;
+        }
+        else
+        {
+            networkTransform.StopIgnoringParentChanges();
+            networkTransform.enabled = true;
+        }
+    }
+
     public override void Interact(ItemUser user)
     {
         user.TryPickupItem(this);
     }
 
-    [ServerRpc]
+    [ServerRpc(runLocally: true)]
     public void SetItemState(ItemLocationState newLocationState)
     {
-        locationState.value = newLocationState;
         if (newLocationState.Location != ItemLocation.World)
         {
             GiveOwnership(newLocationState.Holder.owner, propagateToChildren: true);
@@ -65,39 +81,75 @@ public abstract class Item : Interactable
         {
             GiveOwnership(null, propagateToChildren: true); 
         }
+        
+        locationState.value = newLocationState;
     }
 
     private void OnLocationStateChanged(ItemLocationState newLocationState)
     {
-        var col = GetComponent<Collider>();
-        if (newLocationState.Location == ItemLocation.Held)
+        switch (newLocationState.Location)
         {
-            gameObject.SetActive(true);
-            if (col) col.enabled = false;
-            rb.isKinematic = true;
-            
-            transform.position = newLocationState.Holder.GetItemSlotTransform().position;
-            transform.SetParent(newLocationState.Holder.GetItemSlotTransform(), true);
-            transform.localPosition += GetDeltaPosition();
-            transform.rotation = Quaternion.identity;
-            transform.localRotation = GetRotation(); 
-            networkTransform.enabled = false; // it anyway gets it transform from parent
+            case ItemLocation.Held:
+                ApplyHeld(newLocationState);
+                break;
+
+            case ItemLocation.Inventory:
+                ApplyInventory();
+                break;
+
+            case ItemLocation.World:
+                ApplyWorld();
+                break;
         }
-        else if (newLocationState.Location == ItemLocation.Inventory)
-        {
-             if (col) col.enabled = false;
-            rb.isKinematic = true;
-            gameObject.SetActive(false);
-            networkTransform.enabled = false;
-        }
-        else if (newLocationState.Location == ItemLocation.World)
-        {
-            gameObject.SetActive(true);
-            networkTransform.enabled = true;
-            if (col) col.enabled = true;
-            rb.isKinematic = !isServer;
-            transform.SetParent(null);
-        }
+    }
+
+    public void ApplyHeld(ItemLocationState state)
+    {
+        gameObject.SetActive(true);
+        if (col) col.enabled = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        networkTransform.StartIgnoringParentChanges();
+        networkTransform.enabled = false;
+
+        var slot = state.Holder.GetItemSlotTransform();
+        transform.SetParent(slot, false);
+        transform.localPosition = GetDeltaPosition();
+        transform.localRotation = GetRotation();
+    }
+
+    public void ApplyInventory()
+    {
+        if (col) col.enabled = false;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+
+        networkTransform.StartIgnoringParentChanges();
+        networkTransform.enabled = false;
+        gameObject.SetActive(false);
+
+        transform.SetParent(null);
+    }
+
+    public void ApplyWorld()
+    {
+        gameObject.SetActive(true);
+        if (col) col.enabled = true;
+
+        transform.SetParent(null, true);
+        var landedPos = transform.position;
+        var landedRot = transform.rotation;
+
+        rb.isKinematic = !isServer;
+
+        networkTransform.enabled = true;
+        networkTransform.ClearInterpolation(landedPos, landedRot, transform.localScale);
+        networkTransform.StopIgnoringParentChanges();
     }
 
     private void Update()

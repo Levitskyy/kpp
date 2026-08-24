@@ -74,6 +74,10 @@ public class VoiceEndpoint : MonoBehaviour
     {
         var gm = InstanceHandler.GetInstance<GameManager>();
         gm.OnAudioListenerSpawned += OnListenerSpawned;
+        if (gm.GetAudioListener())
+        {
+            _listenerTransform = gm.GetAudioListener().transform;
+        }
     }
 
 
@@ -101,6 +105,8 @@ public class VoiceEndpoint : MonoBehaviour
             _gain = 1f;
         }
         CleanupIdleSpeakers();
+
+        Debug.Log($"{_gain} :: {gameObject}");
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ public class VoiceDecoder
 {
     private readonly IVoiceCodec _codec;
     private readonly VoiceRingBuffer _ringBuffer;
-    private readonly byte[] _decodeBuffer = new byte[1024 * 8];
+    private readonly byte[] _decodeBuffer = new byte[1024 * 50];
     private float[] _floatScratch = new float[2048];
 
     /// <summary>Timestamp of the last packet received - used by the owning

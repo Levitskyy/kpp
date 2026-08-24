@@ -50,6 +50,7 @@ public class ItemUser : NetworkBehaviour
     {
         if (inventory.Count >= inventory.Capacity) return;
 
+        item.ApplyHeld(ItemLocationState.Held(this)); // CLIENT PREDICTION
         inventory.TryAddItem(item, this, activeSlot);
     }
 
@@ -63,12 +64,14 @@ public class ItemUser : NetworkBehaviour
         if (currentItem)
         {
             currentItem.SetItemState(ItemLocationState.Inventory(this));
+            currentItem.ApplyInventory(); // CLIENT PREDICTION
         }
 
         activeSlot = id;
         if (currentItem)
         {
             currentItem.SetItemState(ItemLocationState.Held(this));
+            currentItem.ApplyHeld(ItemLocationState.Held(this)); // CLIENT PREDICTION
         }
     }
 
@@ -88,6 +91,11 @@ public class ItemUser : NetworkBehaviour
         }
 
         ChangeActiveSlot((activeSlot - 1) % inventory.Capacity);
+    }
+
+    private void DropCurrentItem()
+    {
+        inventory.RemoveItem(activeSlot);
     }
 
     private void CheckForInputs()
@@ -110,7 +118,7 @@ public class ItemUser : NetworkBehaviour
         }
         if (dropItemAction.WasPressedThisFrame())
         {
-            inventory.RemoveItem(activeSlot);
+            DropCurrentItem();
         }
         if(nextActiveSlotAction.ReadValue<float>() > 0)
         {

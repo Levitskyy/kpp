@@ -14,15 +14,23 @@ public class PlayerVoice : NetworkBehaviour
 
     protected override void OnSpawned()
     {
+        // REDO TO GET SAMLERATE FROM VOICE SOURCE
         base.OnSpawned();
         _endpoint = GetComponent<VoiceEndpoint>();
         _endpoint.enabled = !isOwner;
+        _voiceSource = InstanceHandler.GetInstance<LocalVoiceCapture>();
+        if (_voiceSource.IsUsingSteamVoice)
+        {
+            _voiceCodec = new SteamVoiceCodec(_voiceSource.SampleRate);
+        }
+        else
+        {
+            _voiceCodec = new PassthroughVoiceCodec(_voiceSource.SampleRate);
+        }
 
         if (!isOwner) return;
-        _voiceSource = InstanceHandler.GetInstance<LocalVoiceCapture>();
+        _voiceSource.Activate();
         _voiceSource.PacketCaptured += OnPacketCaptured;
-        _voiceCodec = new PassthroughVoiceCodec(_voiceSource.SampleRate);
-
         _voiceAction = InputSystem.actions.FindAction("Voice");
         
     }

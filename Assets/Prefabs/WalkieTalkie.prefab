@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 2130487534305235625}
   - component: {fileID: 7794135593665193745}
   - component: {fileID: 7653878567346254325}
+  - component: {fileID: 6417150065394996536}
   - component: {fileID: 8510360198166782655}
   - component: {fileID: 6999456549993880}
-  - component: {fileID: 6417150065394996536}
   m_Layer: 3
   m_Name: WalkieTalkie
   m_TagString: Untagged
@@ -236,6 +236,30 @@ MonoBehaviour:
   muffledCutoffHz: 800
   clearCutoffHz: 8000
   speakerTimeoutSeconds: 2
+--- !u!114 &6417150065394996536
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 41240148197713115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2657c74dee563db4bb0ac7b278ee7f91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WalkieTalkie
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _name: WalkieTalkie
+  deltaPos: {x: 0, y: 0, z: 0}
+  rot: {x: 0, y: 0, z: 0, w: 1}
 --- !u!114 &8510360198166782655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,13 +285,13 @@ MonoBehaviour:
   _syncRotation: 1
   _syncScale: 1
   _syncParent: 1
-  _forceSleepRb: 1
   _interpolateSettings: 7
   _minBufferSize: 1
   _maxBufferSize: 2
   _characterControllerPatch: 0
   _ownerAuth: 1
   _interpolationTiming: 0
+  _adaptiveSynchronization: 2
 --- !u!54 &6999456549993880
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -295,27 +319,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &6417150065394996536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 41240148197713115}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2657c74dee563db4bb0ac7b278ee7f91, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WalkieTalkie
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _isSetup: 0
-  _prefabId: -2147483648
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
-  _name: WalkieTalkie
-  deltaPos: {x: 0, y: 0, z: 0}
-  rot: {x: 0, y: 0, z: 0, w: 1}

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LocalVoiceCapture : MonoBehaviour
 {
+    public bool IsUsingSteamVoice = false;
     public event Action<byte[], int> PacketCaptured;
 
     private IVoiceSource _voiceSource;
@@ -14,7 +15,6 @@ public class LocalVoiceCapture : MonoBehaviour
     private void Awake()
     {
         InstanceHandler.RegisterInstance(this);
-        Activate();
     }
 
     /// <summary>Call once (from PlayerVoice.OnSpawned, only if isOwner). Idempotent.</summary>
@@ -23,7 +23,14 @@ public class LocalVoiceCapture : MonoBehaviour
         if (_isActive) return;
         _isActive = true;
  
-        _voiceSource = new MicrophoneVoiceSource();
+        if (IsUsingSteamVoice)
+        {
+            _voiceSource = new SteamVoiceSource();
+        }
+        else
+        {
+            _voiceSource = new MicrophoneVoiceSource();
+        }
         _voiceSource.StartCapture();
     }
  

@@ -5,6 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public event Action<AudioListener> OnAudioListenerSpawned;
+    
+    private AudioListener _audioListener;
+    public AudioListener GetAudioListener() => _audioListener; 
 
     private void Awake()
     {
@@ -18,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     public void InvokeAudioListenerSpawned(AudioListener listener)
     {
+        _audioListener = listener;
         OnAudioListenerSpawned?.Invoke(listener);
     }
 }
