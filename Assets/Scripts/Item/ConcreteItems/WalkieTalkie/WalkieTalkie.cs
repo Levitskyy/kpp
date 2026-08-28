@@ -2,8 +2,6 @@ using PurrNet;
 using UnityEngine;
 
 [RequireComponent(typeof(VoiceEndpoint))]
-[RequireComponent(typeof(NetworkTransform))]
-[RequireComponent(typeof(Rigidbody))]
 public class WalkieTalkie : Item
 {
     private VoiceEndpoint _voiceEndpoint;
@@ -67,7 +65,7 @@ public class WalkieTalkie : Item
 
         var trimmed = new byte[length];
         System.Buffer.BlockCopy(data, 0, trimmed, 0, length);
-        InstanceHandler.GetInstance<RadioNetwork>().SendPacket(this, trimmed);
+        InstanceHandler.GetInstance<RadioNetwork>().TransmitToEachOther(this, trimmed);
     }
 
     public void AcceptTransmittedPacket(PlayerID speaker, IVoiceCodec codec, byte[] data)

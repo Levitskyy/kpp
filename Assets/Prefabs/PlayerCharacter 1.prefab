@@ -57,13 +57,13 @@ MonoBehaviour:
   _syncRotation: 1
   _syncScale: 1
   _syncParent: 1
-  _forceSleepRb: 1
   _interpolateSettings: 7
   _minBufferSize: 1
   _maxBufferSize: 2
   _characterControllerPatch: 0
   _ownerAuth: 1
   _interpolationTiming: 0
+  _adaptiveSynchronization: 2
 --- !u!1 &4374760881314319073
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,6 +377,7 @@ MonoBehaviour:
   _parent: {fileID: 0}
   _invertedPathToNearestParent: 
   _directChildren: []
+  throwForce: 3
   itemPos: {fileID: 7244355506142303562}
 --- !u!114 &6700861240849120565
 MonoBehaviour:
@@ -426,13 +427,13 @@ MonoBehaviour:
   _syncRotation: 1
   _syncScale: 1
   _syncParent: 1
-  _forceSleepRb: 1
   _interpolateSettings: 7
   _minBufferSize: 1
   _maxBufferSize: 2
   _characterControllerPatch: 0
   _ownerAuth: 1
   _interpolationTiming: 0
+  _adaptiveSynchronization: 2
 --- !u!114 &917558765426377392
 MonoBehaviour:
   m_ObjectHideFlags: 0

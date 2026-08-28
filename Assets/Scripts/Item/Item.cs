@@ -34,12 +34,17 @@ public abstract class Item : Interactable
     protected override void OnSpawned()
     {
         base.OnSpawned();
+        if (isServer)
+        {
+            GiveOwnership(networkManager.localPlayer, propagateToChildren: true);
+        }
 
-        locationState.onChanged += OnLocationStateChanged;
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         rb.isKinematic = !isController;
         networkTransform = GetComponent<NetworkTransform>();
+        
+        locationState.onChanged += OnLocationStateChanged;
         OnLocationStateChanged(locationState.value);
     }
 
@@ -50,39 +55,28 @@ public abstract class Item : Interactable
         locationState.onChanged -= OnLocationStateChanged;
     }
 
-    protected override void OnOwnerChanged(PlayerID? oldOwner, PlayerID? newOwner, bool asServer)
-    {
-        base.OnOwnerChanged(oldOwner, newOwner, asServer);
-        if (newOwner.HasValue)
-        {
-            networkTransform.StartIgnoringParentChanges();
-            networkTransform.enabled = false;
-        }
-        else
-        {
-            networkTransform.StopIgnoringParentChanges();
-            networkTransform.enabled = true;
-        }
-    }
-
     public override void Interact(ItemUser user)
     {
         user.TryPickupItem(this);
     }
 
-    [ServerRpc(runLocally: true)]
+    
+
+    [ServerRpc(requireOwnership: false, runLocally: true)]
     public void SetItemState(ItemLocationState newLocationState)
     {
-        if (newLocationState.Location != ItemLocation.World)
+
+        if (!isServer && newLocationState.Location != ItemLocation.Held) OnLocationStateChanged(newLocationState);
+
+        if (isServer)
         {
-            GiveOwnership(newLocationState.Holder.owner, propagateToChildren: true);
-        } 
-        else
-        {
-            GiveOwnership(null, propagateToChildren: true); 
+            if (newLocationState.Location != ItemLocation.World)
+            {
+                GiveOwnership(newLocationState.Holder.owner, propagateToChildren: true);
+            }
+
+            locationState.value = newLocationState;
         }
-        
-        locationState.value = newLocationState;
     }
 
     private void OnLocationStateChanged(ItemLocationState newLocationState)
@@ -108,12 +102,7 @@ public abstract class Item : Interactable
         gameObject.SetActive(true);
         if (col) col.enabled = false;
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
-
-        networkTransform.StartIgnoringParentChanges();
-        networkTransform.enabled = false;
 
         var slot = state.Holder.GetItemSlotTransform();
         transform.SetParent(slot, false);
@@ -125,14 +114,8 @@ public abstract class Item : Interactable
     {
         if (col) col.enabled = false;
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
-
-        networkTransform.StartIgnoringParentChanges();
-        networkTransform.enabled = false;
         gameObject.SetActive(false);
-
         transform.SetParent(null);
     }
 
@@ -142,14 +125,8 @@ public abstract class Item : Interactable
         if (col) col.enabled = true;
 
         transform.SetParent(null, true);
-        var landedPos = transform.position;
-        var landedRot = transform.rotation;
 
-        rb.isKinematic = !isServer;
-
-        networkTransform.enabled = true;
-        networkTransform.ClearInterpolation(landedPos, landedRot, transform.localScale);
-        networkTransform.StopIgnoringParentChanges();
+        rb.isKinematic = !isController;
     }
 
     private void Update()

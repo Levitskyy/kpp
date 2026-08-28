@@ -27,14 +27,8 @@ public class RadioNetwork : NetworkBehaviour
         InstanceHandler.UnregisterInstance<RadioNetwork>();
     }
 
-    [ServerRpc(Channel.Unreliable, requireOwnership: false)]
-    public void SendPacket(WalkieTalkie source, byte[] data)
-    {
-        TransmitToEachOther(source, data);
-    }
-
     [ObserversRpc(Channel.Unreliable)]
-    private void TransmitToEachOther(WalkieTalkie source, byte[] data)
+    public void TransmitToEachOther(WalkieTalkie source, byte[] data)
     {
         foreach (var walkieTalkie in _walkieTalkies)
         {

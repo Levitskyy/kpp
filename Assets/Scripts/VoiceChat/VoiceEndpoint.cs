@@ -105,8 +105,6 @@ public class VoiceEndpoint : MonoBehaviour
             _gain = 1f;
         }
         CleanupIdleSpeakers();
-
-        Debug.Log($"{_gain} :: {gameObject}");
     }
 
     /// <summary>

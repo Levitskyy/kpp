@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Inventory))]
 public class ItemUser : NetworkBehaviour
 {
+    [SerializeField] private float throwForce = 1f;
     private int activeSlot = 0;
     private Inventory inventory;
     private Item currentItem => inventory.Get(activeSlot);
@@ -50,7 +51,6 @@ public class ItemUser : NetworkBehaviour
     {
         if (inventory.Count >= inventory.Capacity) return;
 
-        item.ApplyHeld(ItemLocationState.Held(this)); // CLIENT PREDICTION
         inventory.TryAddItem(item, this, activeSlot);
     }
 
@@ -64,14 +64,12 @@ public class ItemUser : NetworkBehaviour
         if (currentItem)
         {
             currentItem.SetItemState(ItemLocationState.Inventory(this));
-            currentItem.ApplyInventory(); // CLIENT PREDICTION
         }
 
         activeSlot = id;
         if (currentItem)
         {
             currentItem.SetItemState(ItemLocationState.Held(this));
-            currentItem.ApplyHeld(ItemLocationState.Held(this)); // CLIENT PREDICTION
         }
     }
 
@@ -95,7 +93,11 @@ public class ItemUser : NetworkBehaviour
 
     private void DropCurrentItem()
     {
-        inventory.RemoveItem(activeSlot);
+        var item = currentItem;
+        inventory.RemoveItem(item);
+        var rb = item.GetComponent<Rigidbody>();
+        var cam = GetComponent<PlayerMovement>().GetPlayerCamera();
+        rb.AddForce(cam.transform.forward * throwForce, ForceMode.VelocityChange);
     }
 
     private void CheckForInputs()
